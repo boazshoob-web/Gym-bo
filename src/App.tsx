@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import BottomNav from "./components/BottomNav";
 import WorkoutPage from "./pages/WorkoutPage";
@@ -14,7 +14,7 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="h-full flex flex-col">
         <Routes>
           <Route path="/" element={<WorkoutPage />} />
@@ -25,6 +25,6 @@ export default function App() {
         </Routes>
         <BottomNav />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
