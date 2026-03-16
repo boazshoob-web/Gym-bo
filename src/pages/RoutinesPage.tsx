@@ -21,8 +21,8 @@ export default function RoutinesPage() {
     }
   }
 
-  function getExName(id: number) {
-    return exercises?.find((e) => e.id === id)?.name ?? "Unknown";
+  function getEx(id: number) {
+    return exercises?.find((e) => e.id === id);
   }
 
   return (
@@ -49,11 +49,15 @@ export default function RoutinesPage() {
               </div>
             </div>
             <div className="flex flex-col gap-1">
-              {r.exercises.map((re, i) => (
-                <div key={i} className="text-sm text-text-muted">
-                  {getExName(re.exerciseId)} — {re.targetSets}×{re.targetReps}
-                </div>
-              ))}
+              {r.exercises.map((re, i) => {
+                const ex = getEx(re.exerciseId);
+                const isCardio = ex?.muscleGroup === "Cardio";
+                return (
+                  <div key={i} className="text-sm text-text-muted">
+                    {ex?.name ?? "Unknown"} — {isCardio ? `${re.targetReps} ${t("workout.min")}` : `${re.targetSets}×${re.targetReps}`}
+                  </div>
+                );
+              })}
               {r.exercises.length === 0 && (
                 <div className="text-sm text-text-muted italic">{t("routines.noExercises")}</div>
               )}
@@ -103,7 +107,13 @@ function RoutineModal({
 
   function addExercise() {
     if (exercises.length === 0) return;
-    setItems([...items, { exerciseId: exercises[0].id!, targetSets: 3, targetReps: 10 }]);
+    const first = exercises[0];
+    const isCardio = first.muscleGroup === "Cardio";
+    setItems([...items, {
+      exerciseId: first.id!,
+      targetSets: isCardio ? 1 : 3,
+      targetReps: isCardio ? 30 : 10,
+    }]);
   }
 
   function updateItem(idx: number, patch: Partial<RoutineExercise>) {
@@ -131,40 +141,69 @@ function RoutineModal({
         <Input label={t("routines.routineName")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("routines.routineNamePlaceholder")} />
 
         <div className="text-xs text-text-muted font-medium mt-1">{t("routines.exercises")}</div>
-        {items.map((item, idx) => (
-          <div key={idx} className="flex items-center gap-2 bg-surface-light rounded-lg p-2">
-            <GripVertical size={14} className="text-text-muted shrink-0" />
-            <Select
-              className="flex-1 min-w-0"
-              value={item.exerciseId}
-              onChange={(e) => updateItem(idx, { exerciseId: Number(e.target.value) })}
-            >
-              {exercises.map((ex) => (
-                <option key={ex.id} value={ex.id}>{ex.name}</option>
-              ))}
-            </Select>
-            <input
-              type="number"
-              min={1}
-              className="w-12 bg-background rounded px-2 py-1 text-sm text-center"
-              value={item.targetSets}
-              onChange={(e) => updateItem(idx, { targetSets: Number(e.target.value) || 1 })}
-              title="Sets"
-            />
-            <span className="text-text-muted text-xs">×</span>
-            <input
-              type="number"
-              min={1}
-              className="w-12 bg-background rounded px-2 py-1 text-sm text-center"
-              value={item.targetReps}
-              onChange={(e) => updateItem(idx, { targetReps: Number(e.target.value) || 1 })}
-              title="Reps"
-            />
-            <button onClick={() => removeItem(idx)} className="text-text-muted hover:text-danger p-1">
-              <Trash2 size={14} />
-            </button>
-          </div>
-        ))}
+        {items.map((item, idx) => {
+          const ex = exercises.find((e) => e.id === item.exerciseId);
+          const isCardio = ex?.muscleGroup === "Cardio";
+          return (
+            <div key={idx} className="flex items-center gap-2 bg-surface-light rounded-lg p-2">
+              <GripVertical size={14} className="text-text-muted shrink-0" />
+              <Select
+                className="flex-1 min-w-0"
+                value={item.exerciseId}
+                onChange={(e) => {
+                  const newId = Number(e.target.value);
+                  const newEx = exercises.find((ex) => ex.id === newId);
+                  const nowCardio = newEx?.muscleGroup === "Cardio";
+                  updateItem(idx, {
+                    exerciseId: newId,
+                    targetSets: nowCardio ? 1 : item.targetSets,
+                    targetReps: nowCardio ? 30 : item.targetReps,
+                  });
+                }}
+              >
+                {exercises.map((ex) => (
+                  <option key={ex.id} value={ex.id}>{ex.name}</option>
+                ))}
+              </Select>
+              {isCardio ? (
+                <>
+                  <input
+                    type="number"
+                    min={1}
+                    className="w-14 bg-background rounded px-2 py-1 text-sm text-center"
+                    value={item.targetReps}
+                    onChange={(e) => updateItem(idx, { targetReps: Number(e.target.value) || 1, targetSets: 1 })}
+                    title={t("workout.min")}
+                  />
+                  <span className="text-text-muted text-xs">{t("workout.min")}</span>
+                </>
+              ) : (
+                <>
+                  <input
+                    type="number"
+                    min={1}
+                    className="w-12 bg-background rounded px-2 py-1 text-sm text-center"
+                    value={item.targetSets}
+                    onChange={(e) => updateItem(idx, { targetSets: Number(e.target.value) || 1 })}
+                    title="Sets"
+                  />
+                  <span className="text-text-muted text-xs">×</span>
+                  <input
+                    type="number"
+                    min={1}
+                    className="w-12 bg-background rounded px-2 py-1 text-sm text-center"
+                    value={item.targetReps}
+                    onChange={(e) => updateItem(idx, { targetReps: Number(e.target.value) || 1 })}
+                    title="Reps"
+                  />
+                </>
+              )}
+              <button onClick={() => removeItem(idx)} className="text-text-muted hover:text-danger p-1">
+                <Trash2 size={14} />
+              </button>
+            </div>
+          );
+        })}
 
         <Button variant="secondary" onClick={addExercise} className="flex items-center gap-1 justify-center">
           <Plus size={14} /> {t("routines.addExercise")}

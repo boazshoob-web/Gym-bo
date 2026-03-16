@@ -75,6 +75,8 @@ export default function WorkoutPage() {
     // Build blocks pre-filled with last weights
     const newBlocks: ExerciseBlock[] = [];
     for (const re of routine.exercises) {
+      const ex = exerciseMap.get(re.exerciseId);
+      const isCardio = ex?.muscleGroup === "Cardio";
       const lastSets = await getLastWeights(re.exerciseId, re.targetSets);
       const sets: LiveSet[] = [];
       for (let i = 0; i < re.targetSets; i++) {
@@ -83,8 +85,8 @@ export default function WorkoutPage() {
           exerciseId: re.exerciseId,
           setNumber: i + 1,
           weight: prev?.weight ?? 0,
-          reps: prev?.reps ?? re.targetReps,
-          duration: prev?.duration ?? 0,
+          reps: prev?.reps ?? (isCardio ? 0 : re.targetReps),
+          duration: prev?.duration ?? (isCardio ? re.targetReps : 0),
           done: false,
         });
       }
