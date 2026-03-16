@@ -149,8 +149,17 @@ function ExerciseModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={exercise ? t("exercises.editExercise") : t("exercises.newExercise")}>
-      <div className="flex flex-col gap-3">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={exercise ? t("exercises.editExercise") : t("exercises.newExercise")}
+      footer={
+        <Button onClick={handleSave} className="w-full">
+          {exercise ? t("exercises.saveChanges") : t("exercises.addExercise")}
+        </Button>
+      }
+    >
+      <div className="flex flex-col gap-3 pb-1">
         <Input label={t("exercises.name")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("exercises.namePlaceholder")} />
         <Select label={t("exercises.muscleGroup")} value={muscleGroup} onChange={(e) => setMuscleGroup(e.target.value as MuscleGroup)}>
           {MUSCLE_GROUPS.map((g) => (
@@ -159,9 +168,6 @@ function ExerciseModal({
         </Select>
         <Input label={t("exercises.equipment")} value={equipment} onChange={(e) => setEquipment(e.target.value)} placeholder={t("exercises.equipmentPlaceholder")} />
         <Input label={t("exercises.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("exercises.notesPlaceholder")} />
-        <Button onClick={handleSave} className="mt-2">
-          {exercise ? t("exercises.saveChanges") : t("exercises.addExercise")}
-        </Button>
       </div>
     </Modal>
   );

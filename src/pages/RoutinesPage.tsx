@@ -136,8 +136,17 @@ function RoutineModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={routine ? t("routines.editRoutine") : t("routines.newRoutine")}>
-      <div className="flex flex-col gap-3">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={routine ? t("routines.editRoutine") : t("routines.newRoutine")}
+      footer={
+        <Button onClick={handleSave} className="w-full">
+          {routine ? t("routines.saveChanges") : t("routines.createRoutine")}
+        </Button>
+      }
+    >
+      <div className="flex flex-col gap-3 pb-1">
         <Input label={t("routines.routineName")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("routines.routineNamePlaceholder")} />
 
         <div className="text-xs text-text-muted font-medium mt-1">{t("routines.exercises")}</div>
@@ -207,9 +216,6 @@ function RoutineModal({
 
         <Button variant="secondary" onClick={addExercise} className="flex items-center gap-1 justify-center">
           <Plus size={14} /> {t("routines.addExercise")}
-        </Button>
-        <Button onClick={handleSave} className="mt-1">
-          {routine ? t("routines.saveChanges") : t("routines.createRoutine")}
         </Button>
       </div>
     </Modal>
