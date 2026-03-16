@@ -16,7 +16,7 @@ export default function Modal({
 }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className="relative bg-surface rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md flex flex-col overflow-hidden" style={{ maxHeight: "calc(100% - 2rem)" }}>
         <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
