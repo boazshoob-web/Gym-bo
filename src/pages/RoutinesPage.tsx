@@ -112,7 +112,7 @@ function RoutineModal({
     setItems([...items, {
       exerciseId: first.id!,
       targetSets: isCardio ? 1 : 3,
-      targetReps: isCardio ? 30 : 10,
+      targetReps: isCardio ? 30 : 12,
     }]);
   }
 

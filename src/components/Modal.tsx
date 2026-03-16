@@ -25,7 +25,7 @@ export default function Modal({
             <X size={20} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-5 min-h-0">
+        <div className="overflow-y-auto px-5 min-h-0">
           {children}
         </div>
         {footer && (

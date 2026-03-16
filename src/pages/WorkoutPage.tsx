@@ -118,7 +118,7 @@ export default function WorkoutPage() {
         exerciseId,
         setNumber: i + 1,
         weight: prev?.weight ?? 0,
-        reps: prev?.reps ?? (isCardio ? 0 : 10),
+        reps: prev?.reps ?? (isCardio ? 0 : 12),
         duration: prev?.duration ?? (isCardio ? 30 : 0),
         done: false,
       });
@@ -149,7 +149,7 @@ export default function WorkoutPage() {
                   exerciseId: b.exerciseId,
                   setNumber: b.sets.length + 1,
                   weight: b.sets.at(-1)?.weight ?? 0,
-                  reps: b.sets.at(-1)?.reps ?? 10,
+                  reps: b.sets.at(-1)?.reps ?? 12,
                   duration: b.sets.at(-1)?.duration ?? 0,
                   done: false,
                 },
