@@ -7,8 +7,10 @@ import Modal from "../components/Modal";
 import Input, { Select } from "../components/Input";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { getExerciseIcon } from "../exerciseIcons";
+import { useI18n } from "../i18n";
 
 export default function ExercisesPage() {
+  const { t, tMuscle } = useI18n();
   const [filter, setFilter] = useState<MuscleGroup | "All">("All");
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Exercise | null>(null);
@@ -32,23 +34,23 @@ export default function ExercisesPage() {
   }
 
   async function handleDelete(id: number) {
-    if (confirm("Delete this exercise?")) {
+    if (confirm(t("exercises.deleteConfirm"))) {
       await db.exercises.delete(id);
     }
   }
 
   return (
     <PageShell
-      title="Exercises"
+      title={t("nav.exercises")}
       action={
         <Button onClick={openNew} className="flex items-center gap-1">
-          <Plus size={16} /> Add
+          <Plus size={16} /> {t("exercises.add")}
         </Button>
       }
     >
       {/* Filter pills */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-3 -mx-1 px-1">
-        {["All", ...MUSCLE_GROUPS].map((g) => (
+        {(["All", ...MUSCLE_GROUPS] as const).map((g) => (
           <button
             key={g}
             onClick={() => setFilter(g as MuscleGroup | "All")}
@@ -58,7 +60,7 @@ export default function ExercisesPage() {
                 : "bg-surface-light text-text-muted"
             }`}
           >
-            {g}
+            {g === "All" ? t("exercises.all") : tMuscle(g)}
           </button>
         ))}
       </div>
@@ -75,7 +77,7 @@ export default function ExercisesPage() {
               <div>
                 <div className="font-medium text-sm">{ex.name}</div>
                 <div className="text-xs text-text-muted">
-                  {ex.muscleGroup} &middot; {ex.equipment}
+                  {tMuscle(ex.muscleGroup)} &middot; {ex.equipment}
                 </div>
               </div>
             </div>
@@ -97,7 +99,7 @@ export default function ExercisesPage() {
         ))}
         {exercises?.length === 0 && (
           <p className="text-text-muted text-sm text-center py-8">
-            No exercises yet. Add one!
+            {t("exercises.noExercises")}
           </p>
         )}
       </div>
@@ -120,6 +122,7 @@ function ExerciseModal({
   onClose: () => void;
   exercise: Exercise | null;
 }) {
+  const { t, tMuscle } = useI18n();
   const [name, setName] = useState("");
   const [muscleGroup, setMuscleGroup] = useState<MuscleGroup>("Chest");
   const [equipment, setEquipment] = useState("");
@@ -146,18 +149,18 @@ function ExerciseModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={exercise ? "Edit Exercise" : "New Exercise"}>
+    <Modal open={open} onClose={onClose} title={exercise ? t("exercises.editExercise") : t("exercises.newExercise")}>
       <div className="flex flex-col gap-3">
-        <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Bench Press" />
-        <Select label="Muscle Group" value={muscleGroup} onChange={(e) => setMuscleGroup(e.target.value as MuscleGroup)}>
+        <Input label={t("exercises.name")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("exercises.namePlaceholder")} />
+        <Select label={t("exercises.muscleGroup")} value={muscleGroup} onChange={(e) => setMuscleGroup(e.target.value as MuscleGroup)}>
           {MUSCLE_GROUPS.map((g) => (
-            <option key={g} value={g}>{g}</option>
+            <option key={g} value={g}>{tMuscle(g)}</option>
           ))}
         </Select>
-        <Input label="Equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} placeholder="e.g. Barbell, Machine" />
-        <Input label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional notes" />
+        <Input label={t("exercises.equipment")} value={equipment} onChange={(e) => setEquipment(e.target.value)} placeholder={t("exercises.equipmentPlaceholder")} />
+        <Input label={t("exercises.notes")} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("exercises.notesPlaceholder")} />
         <Button onClick={handleSave} className="mt-2">
-          {exercise ? "Save Changes" : "Add Exercise"}
+          {exercise ? t("exercises.saveChanges") : t("exercises.addExercise")}
         </Button>
       </div>
     </Modal>

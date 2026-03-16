@@ -4,8 +4,10 @@ import PageShell from "../components/PageShell";
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { getExerciseIcon } from "../exerciseIcons";
+import { useI18n } from "../i18n";
 
 export default function HistoryPage() {
+  const { t, lang } = useI18n();
   const sessions = useLiveQuery(() => db.sessions.orderBy("date").reverse().toArray()) ?? [];
   const allSets = useLiveQuery(() => db.sets.toArray()) ?? [];
   const exercises = useLiveQuery(() => db.exercises.toArray()) ?? [];
@@ -15,27 +17,28 @@ export default function HistoryPage() {
 
   function formatDate(dateStr: string) {
     const d = new Date(dateStr + "T00:00:00");
-    return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    const locale = lang === "he" ? "he-IL" : "en-US";
+    return d.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" });
   }
 
   function getDuration(session: (typeof sessions)[0]) {
     if (!session.startedAt || !session.finishedAt) return null;
     const diff = Math.floor((new Date(session.finishedAt).getTime() - new Date(session.startedAt).getTime()) / 60000);
-    return `${diff} min`;
+    return `${diff} ${t("history.min")}`;
   }
 
   async function handleDelete(id: number) {
-    if (confirm("Delete this workout session?")) {
+    if (confirm(t("history.deleteConfirm"))) {
       await db.sets.where("sessionId").equals(id).delete();
       await db.sessions.delete(id);
     }
   }
 
   return (
-    <PageShell title="History">
+    <PageShell title={t("nav.history")}>
       {sessions.length === 0 ? (
         <p className="text-text-muted text-sm text-center py-16">
-          No workout history yet. Complete a workout to see it here.
+          {t("history.noHistory")}
         </p>
       ) : (
         <div className="flex flex-col gap-2">
@@ -54,8 +57,8 @@ export default function HistoryPage() {
                   <div>
                     <div className="font-medium text-sm">{formatDate(s.date)}</div>
                     <div className="text-xs text-text-muted">
-                      {s.routineName ?? "Free workout"} &middot; {exerciseIds.length} exercises
-                      {duration && ` &middot; ${duration}`}
+                      {s.routineName ?? t("history.freeWorkout")} &middot; {exerciseIds.length} {t("history.exercises")}
+                      {duration && ` \u00b7 ${duration}`}
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
@@ -84,11 +87,11 @@ export default function HistoryPage() {
                             {sets.map((set) => (
                               <div key={set.id} className="text-xs text-text-muted flex gap-3">
                                 {ex?.muscleGroup === "Cardio" ? (
-                                  <span>{set.duration ?? 0} min</span>
+                                  <span>{set.duration ?? 0} {t("history.min")}</span>
                                 ) : (
                                   <>
-                                    <span>Set {set.setNumber}</span>
-                                    <span>{set.weight} kg × {set.reps}</span>
+                                    <span>{t("history.set")} {set.setNumber}</span>
+                                    <span>{set.weight} {t("workout.kg")} × {set.reps}</span>
                                   </>
                                 )}
                               </div>
@@ -98,7 +101,7 @@ export default function HistoryPage() {
                       );
                     })}
                     {sessionSets.length === 0 && (
-                      <div className="text-xs text-text-muted italic">No sets logged</div>
+                      <div className="text-xs text-text-muted italic">{t("history.noSets")}</div>
                     )}
                   </div>
                 )}

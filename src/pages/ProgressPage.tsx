@@ -14,13 +14,17 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import { useI18n } from "../i18n";
 
 export default function ProgressPage() {
+  const { t, lang } = useI18n();
   const exercises = useLiveQuery(() => db.exercises.orderBy("name").toArray()) ?? [];
   const allSets = useLiveQuery(() => db.sets.toArray()) ?? [];
   const sessions = useLiveQuery(() => db.sessions.toArray()) ?? [];
   const [selectedExId, setSelectedExId] = useState<number | null>(null);
   const [chart, setChart] = useState<"weight" | "volume">("weight");
+
+  const locale = lang === "he" ? "he-IL" : "en-US";
 
   // Auto-select first exercise
   const exId = selectedExId ?? exercises[0]?.id ?? null;
@@ -45,10 +49,10 @@ export default function ProgressPage() {
     return [...byDate.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, data]) => ({
-        date: new Date(date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        date: new Date(date + "T00:00:00").toLocaleDateString(locale, { month: "short", day: "numeric" }),
         ...data,
       }));
-  }, [exId, allSets, sessions]);
+  }, [exId, allSets, sessions, locale]);
 
   // Volume per session (total kg×reps)
   const volumeBySession = useMemo(() => {
@@ -62,13 +66,13 @@ export default function ProgressPage() {
     return [...byDate.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, volume]) => ({
-        date: new Date(date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        date: new Date(date + "T00:00:00").toLocaleDateString(locale, { month: "short", day: "numeric" }),
         volume,
       }));
-  }, [allSets, sessions]);
+  }, [allSets, sessions, locale]);
 
   return (
-    <PageShell title="Progress">
+    <PageShell title={t("nav.progress")}>
       <div className="flex gap-2 mb-4">
         <button
           onClick={() => setChart("weight")}
@@ -76,7 +80,7 @@ export default function ProgressPage() {
             chart === "weight" ? "bg-primary text-white" : "bg-surface-light text-text-muted"
           }`}
         >
-          Exercise Weight
+          {t("progress.exerciseWeight")}
         </button>
         <button
           onClick={() => setChart("volume")}
@@ -84,14 +88,14 @@ export default function ProgressPage() {
             chart === "volume" ? "bg-primary text-white" : "bg-surface-light text-text-muted"
           }`}
         >
-          Total Volume
+          {t("progress.totalVolume")}
         </button>
       </div>
 
       {chart === "weight" && (
         <>
           <Select
-            label="Exercise"
+            label={t("progress.exercise")}
             value={exId ?? ""}
             onChange={(e) => setSelectedExId(Number(e.target.value))}
             className="mb-4"
@@ -103,7 +107,7 @@ export default function ProgressPage() {
 
           {exerciseData.length > 0 ? (
             <div className="bg-surface rounded-xl p-4">
-              <h3 className="text-sm font-medium mb-3">Max Weight (kg)</h3>
+              <h3 className="text-sm font-medium mb-3">{t("progress.maxWeight")}</h3>
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={exerciseData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -119,7 +123,7 @@ export default function ProgressPage() {
             </div>
           ) : (
             <p className="text-text-muted text-sm text-center py-8">
-              No data yet for this exercise. Complete some workouts first!
+              {t("progress.noExerciseData")}
             </p>
           )}
         </>
@@ -127,7 +131,7 @@ export default function ProgressPage() {
 
       {chart === "volume" && (
         <div className="bg-surface rounded-xl p-4">
-          <h3 className="text-sm font-medium mb-3">Total Volume per Session (kg × reps)</h3>
+          <h3 className="text-sm font-medium mb-3">{t("progress.volumePerSession")}</h3>
           {volumeBySession.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={volumeBySession}>
@@ -143,7 +147,7 @@ export default function ProgressPage() {
             </ResponsiveContainer>
           ) : (
             <p className="text-text-muted text-sm text-center py-8">
-              No data yet. Complete some workouts first!
+              {t("progress.noVolumeData")}
             </p>
           )}
         </div>

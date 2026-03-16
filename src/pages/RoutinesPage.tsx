@@ -6,15 +6,17 @@ import Button from "../components/Button";
 import Modal from "../components/Modal";
 import Input, { Select } from "../components/Input";
 import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
+import { useI18n } from "../i18n";
 
 export default function RoutinesPage() {
+  const { t } = useI18n();
   const routines = useLiveQuery(() => db.routines.toArray());
   const exercises = useLiveQuery(() => db.exercises.orderBy("name").toArray());
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Routine | null>(null);
 
   async function handleDelete(id: number) {
-    if (confirm("Delete this routine?")) {
+    if (confirm(t("routines.deleteConfirm"))) {
       await db.routines.delete(id);
     }
   }
@@ -25,10 +27,10 @@ export default function RoutinesPage() {
 
   return (
     <PageShell
-      title="Routines"
+      title={t("nav.routines")}
       action={
         <Button onClick={() => { setEditing(null); setModalOpen(true); }} className="flex items-center gap-1">
-          <Plus size={16} /> New
+          <Plus size={16} /> {t("routines.new")}
         </Button>
       }
     >
@@ -53,14 +55,14 @@ export default function RoutinesPage() {
                 </div>
               ))}
               {r.exercises.length === 0 && (
-                <div className="text-sm text-text-muted italic">No exercises in this routine</div>
+                <div className="text-sm text-text-muted italic">{t("routines.noExercises")}</div>
               )}
             </div>
           </div>
         ))}
         {routines?.length === 0 && (
           <p className="text-text-muted text-sm text-center py-8">
-            No routines yet. Create one to pre-fill your workouts!
+            {t("routines.noRoutines")}
           </p>
         )}
       </div>
@@ -88,6 +90,7 @@ function RoutineModal({
   routine: Routine | null;
   exercises: Exercise[];
 }) {
+  const { t } = useI18n();
   const [name, setName] = useState("");
   const [items, setItems] = useState<RoutineExercise[]>([]);
 
@@ -123,11 +126,11 @@ function RoutineModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={routine ? "Edit Routine" : "New Routine"}>
+    <Modal open={open} onClose={onClose} title={routine ? t("routines.editRoutine") : t("routines.newRoutine")}>
       <div className="flex flex-col gap-3">
-        <Input label="Routine Name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Push Day" />
+        <Input label={t("routines.routineName")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("routines.routineNamePlaceholder")} />
 
-        <div className="text-xs text-text-muted font-medium mt-1">Exercises</div>
+        <div className="text-xs text-text-muted font-medium mt-1">{t("routines.exercises")}</div>
         {items.map((item, idx) => (
           <div key={idx} className="flex items-center gap-2 bg-surface-light rounded-lg p-2">
             <GripVertical size={14} className="text-text-muted shrink-0" />
@@ -164,10 +167,10 @@ function RoutineModal({
         ))}
 
         <Button variant="secondary" onClick={addExercise} className="flex items-center gap-1 justify-center">
-          <Plus size={14} /> Add Exercise
+          <Plus size={14} /> {t("routines.addExercise")}
         </Button>
         <Button onClick={handleSave} className="mt-1">
-          {routine ? "Save Changes" : "Create Routine"}
+          {routine ? t("routines.saveChanges") : t("routines.createRoutine")}
         </Button>
       </div>
     </Modal>

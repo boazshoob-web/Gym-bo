@@ -7,6 +7,7 @@ import Modal from "../components/Modal";
 import { Select } from "../components/Input";
 import { Play, Square, Plus, Trash2, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { getExerciseIcon } from "../exerciseIcons";
+import { useI18n } from "../i18n";
 
 interface LiveSet {
   exerciseId: number;
@@ -24,6 +25,7 @@ interface ExerciseBlock {
 }
 
 export default function WorkoutPage() {
+  const { t, tMuscle } = useI18n();
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [blocks, setBlocks] = useState<ExerciseBlock[]>([]);
   const [pickingRoutine, setPickingRoutine] = useState(false);
@@ -202,35 +204,35 @@ export default function WorkoutPage() {
   // Not in a workout — show start options
   if (!sessionId) {
     return (
-      <PageShell title="Workout">
+      <PageShell title={t("nav.workout")}>
         <div className="flex flex-col items-center justify-center gap-4 py-16">
           <div className="text-6xl mb-2">&#127947;</div>
-          <h2 className="text-xl font-bold">Ready to train?</h2>
+          <h2 className="text-xl font-bold">{t("workout.readyToTrain")}</h2>
           <p className="text-text-muted text-sm text-center max-w-xs">
-            Start a workout from a routine or build one as you go.
+            {t("workout.startDesc")}
           </p>
           <div className="flex flex-col gap-3 w-full max-w-xs mt-4">
             {routines.length > 0 && (
               <Button onClick={() => setPickingRoutine(true)} className="w-full flex items-center justify-center gap-2">
-                <Play size={16} /> Start from Routine
+                <Play size={16} /> {t("workout.startFromRoutine")}
               </Button>
             )}
             <Button variant="secondary" onClick={startEmpty} className="w-full flex items-center justify-center gap-2">
-              <Plus size={16} /> Empty Workout
+              <Plus size={16} /> {t("workout.emptyWorkout")}
             </Button>
           </div>
         </div>
 
-        <Modal open={pickingRoutine} onClose={() => setPickingRoutine(false)} title="Pick a Routine">
+        <Modal open={pickingRoutine} onClose={() => setPickingRoutine(false)} title={t("workout.pickRoutine")}>
           <div className="flex flex-col gap-2">
             {routines.map((r) => (
               <button
                 key={r.id}
                 onClick={() => startWithRoutine(r)}
-                className="bg-surface-light rounded-xl p-3 text-left hover:bg-primary/20 transition-colors"
+                className="bg-surface-light rounded-xl p-3 text-start hover:bg-primary/20 transition-colors"
               >
                 <div className="font-medium">{r.name}</div>
-                <div className="text-xs text-text-muted">{r.exercises.length} exercises</div>
+                <div className="text-xs text-text-muted">{r.exercises.length} {t("workout.exercises")}</div>
               </button>
             ))}
           </div>
@@ -245,14 +247,14 @@ export default function WorkoutPage() {
 
   return (
     <PageShell
-      title="Workout"
+      title={t("nav.workout")}
       action={
         <div className="flex items-center gap-3">
           <span className="text-sm text-text-muted flex items-center gap-1">
             <Clock size={14} /> {elapsed}
           </span>
           <Button variant="danger" onClick={finishWorkout} className="flex items-center gap-1">
-            <Square size={14} /> Finish
+            <Square size={14} /> {t("workout.finish")}
           </Button>
         </div>
       }
@@ -260,7 +262,7 @@ export default function WorkoutPage() {
       {/* Progress bar */}
       <div className="mb-4">
         <div className="flex justify-between text-xs text-text-muted mb-1">
-          <span>{totalDone}/{totalSets} sets done</span>
+          <span>{totalDone}/{totalSets} {t("workout.setsDone")}</span>
         </div>
         <div className="h-2 bg-surface-light rounded-full overflow-hidden">
           <div
@@ -285,11 +287,11 @@ export default function WorkoutPage() {
                 <div className="flex items-center gap-2.5">
                   {(() => { const Icon = getExerciseIcon(ex?.name ?? "", ex?.muscleGroup ?? "Other"); return <Icon size={18} className="text-primary-light shrink-0" />; })()}
                   <div>
-                    <div className="font-medium text-sm">{ex?.name ?? "Unknown"}</div>
+                    <div className="font-medium text-sm">{ex?.name ?? t("workout.unknown")}</div>
                     <div className="text-xs text-text-muted">
                       {isCardio
-                        ? (doneSets > 0 ? "Done" : "Not done")
-                        : `${doneSets}/${block.sets.length} sets`}
+                        ? (doneSets > 0 ? t("workout.done") : t("workout.notDone"))
+                        : `${doneSets}/${block.sets.length} ${t("workout.sets")}`}
                     </div>
                   </div>
                 </div>
@@ -323,7 +325,7 @@ export default function WorkoutPage() {
                             onChange={(e) => updateSet(bi, si, { duration: Number(e.target.value) })}
                             placeholder="0"
                           />
-                          <span className="text-xs text-text-muted">min</span>
+                          <span className="text-xs text-text-muted">{t("workout.min")}</span>
                           <div className="flex-1" />
                           <button
                             onClick={() => updateSet(bi, si, { done: !s.done })}
@@ -342,10 +344,10 @@ export default function WorkoutPage() {
                     /* Strength: weight × reps grid */
                     <>
                       <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 text-xs text-text-muted mb-1 px-1">
-                        <span>Set</span>
-                        <span>Previous</span>
-                        <span>kg</span>
-                        <span>Reps</span>
+                        <span>{t("workout.set")}</span>
+                        <span>{t("workout.previous")}</span>
+                        <span>{t("workout.kg")}</span>
+                        <span>{t("workout.reps")}</span>
                         <span className="w-6" />
                       </div>
 
@@ -390,7 +392,7 @@ export default function WorkoutPage() {
 
                       <div className="flex gap-2 mt-2">
                         <Button variant="ghost" onClick={() => addSet(bi)} className="text-xs flex-1">
-                          + Add Set
+                          {t("workout.addSet")}
                         </Button>
                         <Button
                           variant="ghost"
@@ -398,7 +400,7 @@ export default function WorkoutPage() {
                           className="text-xs"
                           disabled={block.sets.length <= 1}
                         >
-                          - Remove
+                          {t("workout.removeSet")}
                         </Button>
                       </div>
                     </>
@@ -416,21 +418,21 @@ export default function WorkoutPage() {
         onClick={() => setAddingExercise(true)}
         className="w-full mt-4 flex items-center justify-center gap-1"
       >
-        <Plus size={16} /> Add Exercise
+        <Plus size={16} /> {t("workout.addExercise")}
       </Button>
 
-      <Modal open={addingExercise} onClose={() => setAddingExercise(false)} title="Add Exercise">
+      <Modal open={addingExercise} onClose={() => setAddingExercise(false)} title={t("workout.addExercise")}>
         <div className="flex flex-col gap-1 max-h-80 overflow-y-auto">
           {exercises.map((ex) => (
             <button
               key={ex.id}
               onClick={() => addExerciseToWorkout(ex.id!)}
-              className="text-left p-3 rounded-lg hover:bg-surface-light transition-colors flex items-center gap-3"
+              className="text-start p-3 rounded-lg hover:bg-surface-light transition-colors flex items-center gap-3"
             >
               {(() => { const Icon = getExerciseIcon(ex.name, ex.muscleGroup); return <Icon size={18} className="text-primary-light shrink-0" />; })()}
               <div>
                 <div className="text-sm font-medium">{ex.name}</div>
-                <div className="text-xs text-text-muted">{ex.muscleGroup} &middot; {ex.equipment}</div>
+                <div className="text-xs text-text-muted">{tMuscle(ex.muscleGroup)} &middot; {ex.equipment}</div>
               </div>
             </button>
           ))}
