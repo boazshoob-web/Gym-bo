@@ -10,7 +10,7 @@ import { getExerciseIcon } from "../exerciseIcons";
 import { useI18n } from "../i18n";
 
 export default function ExercisesPage() {
-  const { t, tMuscle } = useI18n();
+  const { t, tMuscle, tExercise } = useI18n();
   const [filter, setFilter] = useState<MuscleGroup | "All">("All");
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Exercise | null>(null);
@@ -75,7 +75,7 @@ export default function ExercisesPage() {
             <div className="flex items-center gap-3">
               {(() => { const Icon = getExerciseIcon(ex.name, ex.muscleGroup); return <Icon size={20} className="text-primary-light shrink-0" />; })()}
               <div>
-                <div className="font-medium text-sm">{ex.name}</div>
+                <div className="font-medium text-sm">{tExercise(ex.name)}</div>
                 <div className="text-xs text-text-muted">
                   {tMuscle(ex.muscleGroup)} &middot; {ex.equipment}
                 </div>

@@ -17,7 +17,7 @@ import {
 import { useI18n } from "../i18n";
 
 export default function ProgressPage() {
-  const { t, lang } = useI18n();
+  const { t, lang, tExercise } = useI18n();
   const exercises = useLiveQuery(() => db.exercises.orderBy("name").toArray()) ?? [];
   const allSets = useLiveQuery(() => db.sets.toArray()) ?? [];
   const sessions = useLiveQuery(() => db.sessions.toArray()) ?? [];
@@ -101,7 +101,7 @@ export default function ProgressPage() {
             className="mb-4"
           >
             {exercises.map((ex) => (
-              <option key={ex.id} value={ex.id}>{ex.name}</option>
+              <option key={ex.id} value={ex.id}>{tExercise(ex.name)}</option>
             ))}
           </Select>
 

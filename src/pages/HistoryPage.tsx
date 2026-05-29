@@ -7,7 +7,7 @@ import { getExerciseIcon } from "../exerciseIcons";
 import { useI18n } from "../i18n";
 
 export default function HistoryPage() {
-  const { t, lang } = useI18n();
+  const { t, lang, tExercise } = useI18n();
   const sessions = useLiveQuery(() => db.sessions.orderBy("date").reverse().toArray()) ?? [];
   const allSets = useLiveQuery(() => db.sets.toArray()) ?? [];
   const exercises = useLiveQuery(() => db.exercises.toArray()) ?? [];
@@ -81,7 +81,7 @@ export default function HistoryPage() {
                         <div key={exId} className="mb-3">
                           <div className="text-sm font-medium text-primary-light mb-1 flex items-center gap-2">
                             {(() => { const Icon = getExerciseIcon(ex?.name ?? "", ex?.muscleGroup ?? "Other"); return <Icon size={14} className="shrink-0" />; })()}
-                            {ex?.name ?? "Unknown"}
+                            {ex?.name ? tExercise(ex.name) : "Unknown"}
                           </div>
                           <div className="flex flex-col gap-0.5">
                             {sets.map((set) => (

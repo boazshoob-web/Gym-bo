@@ -92,6 +92,51 @@ const translations = {
   "muscle.Other": { en: "Other", he: "אחר" },
 } as const;
 
+// Hebrew names for the built-in default exercises. Custom exercises added by
+// the user are not in this map and fall back to their original name.
+const exerciseTranslations: Record<string, string> = {
+  // Chest
+  "Bench Press": "לחיצת חזה",
+  "Incline Dumbbell Press": "לחיצת חזה בשיפוע עם משקולות",
+  "Cable Fly": "פרפר בכבל",
+  "Chest Press Machine": "מכונת לחיצת חזה",
+  "Push-ups": "שכיבות סמיכה",
+  // Back
+  "Lat Pulldown": "משיכת פולי עליון",
+  "Seated Row": "חתירה בישיבה",
+  "Barbell Row": "חתירה עם מוט",
+  "Pull-ups": "מתח",
+  "T-Bar Row": "חתירת מוט T",
+  // Legs
+  "Squat": "סקוואט",
+  "Leg Press": "לחיצת רגליים",
+  "Leg Extension": "פשיטת ברכיים",
+  "Leg Curl": "כפיפת ברכיים",
+  "Calf Raise": "כפיפת תאומים",
+  "Romanian Deadlift": "דדליפט רומני",
+  "Lunges": "לאנג'ים",
+  // Shoulders
+  "Overhead Press": "לחיצת כתפיים מעל הראש",
+  "Lateral Raise": "הרחקת זרועות לצדדים",
+  "Front Raise": "הרמת זרועות קדמית",
+  "Face Pull": "משיכה לפנים",
+  "Shoulder Press Machine": "מכונת לחיצת כתפיים",
+  // Arms
+  "Bicep Curl": "כפיפת מרפקים",
+  "Tricep Pushdown": "פשיטת מרפק בפולי",
+  "Hammer Curl": "כפיפת פטיש",
+  "Skull Crusher": "סקאל קראשר",
+  "Preacher Curl": "כפיפת מרפקים בספסל סקוט",
+  // Core
+  "Plank": "פלאנק",
+  "Cable Crunch": "כפיפות בטן בכבל",
+  "Hanging Leg Raise": "הרמת רגליים בתלייה",
+  // Cardio
+  "Treadmill": "הליכון",
+  "Elliptical": "אליפטיקל",
+  "Rowing Machine": "מכונת חתירה",
+};
+
 export type TranslationKey = keyof typeof translations;
 
 interface I18nContextType {
@@ -99,6 +144,7 @@ interface I18nContextType {
   setLang: (lang: Lang) => void;
   t: (key: TranslationKey) => string;
   tMuscle: (muscle: string) => string;
+  tExercise: (name: string) => string;
 }
 
 const I18nContext = createContext<I18nContextType | null>(null);
@@ -128,8 +174,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     return muscle;
   }
 
+  function tExercise(name: string): string {
+    if (lang === "he" && name in exerciseTranslations) {
+      return exerciseTranslations[name];
+    }
+    return name;
+  }
+
   return (
-    <I18nContext.Provider value={{ lang, setLang, t, tMuscle }}>
+    <I18nContext.Provider value={{ lang, setLang, t, tMuscle, tExercise }}>
       {children}
     </I18nContext.Provider>
   );

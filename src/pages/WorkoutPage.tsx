@@ -25,7 +25,7 @@ interface ExerciseBlock {
 }
 
 export default function WorkoutPage() {
-  const { t, tMuscle } = useI18n();
+  const { t, tMuscle, tExercise } = useI18n();
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [blocks, setBlocks] = useState<ExerciseBlock[]>([]);
   const [pickingRoutine, setPickingRoutine] = useState(false);
@@ -289,7 +289,7 @@ export default function WorkoutPage() {
                 <div className="flex items-center gap-2.5">
                   {(() => { const Icon = getExerciseIcon(ex?.name ?? "", ex?.muscleGroup ?? "Other"); return <Icon size={18} className="text-primary-light shrink-0" />; })()}
                   <div>
-                    <div className="font-medium text-sm">{ex?.name ?? t("workout.unknown")}</div>
+                    <div className="font-medium text-sm">{ex?.name ? tExercise(ex.name) : t("workout.unknown")}</div>
                     <div className="text-xs text-text-muted">
                       {isCardio
                         ? (doneSets > 0 ? t("workout.done") : t("workout.notDone"))
@@ -433,7 +433,7 @@ export default function WorkoutPage() {
             >
               {(() => { const Icon = getExerciseIcon(ex.name, ex.muscleGroup); return <Icon size={18} className="text-primary-light shrink-0" />; })()}
               <div>
-                <div className="text-sm font-medium">{ex.name}</div>
+                <div className="text-sm font-medium">{tExercise(ex.name)}</div>
                 <div className="text-xs text-text-muted">{tMuscle(ex.muscleGroup)} &middot; {ex.equipment}</div>
               </div>
             </button>

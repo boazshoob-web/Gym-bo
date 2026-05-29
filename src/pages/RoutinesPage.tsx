@@ -9,7 +9,7 @@ import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
 import { useI18n } from "../i18n";
 
 export default function RoutinesPage() {
-  const { t } = useI18n();
+  const { t, tExercise } = useI18n();
   const routines = useLiveQuery(() => db.routines.toArray());
   const exercises = useLiveQuery(() => db.exercises.orderBy("name").toArray());
   const [modalOpen, setModalOpen] = useState(false);
@@ -54,7 +54,7 @@ export default function RoutinesPage() {
                 const isCardio = ex?.muscleGroup === "Cardio";
                 return (
                   <div key={i} className="text-sm text-text-muted">
-                    {ex?.name ?? "Unknown"} — {isCardio ? `${re.targetReps} ${t("workout.min")}` : `${re.targetSets}×${re.targetReps}`}
+                    {ex?.name ? tExercise(ex.name) : "Unknown"} — {isCardio ? `${re.targetReps} ${t("workout.min")}` : `${re.targetSets}×${re.targetReps}`}
                   </div>
                 );
               })}
@@ -94,7 +94,7 @@ function RoutineModal({
   routine: Routine | null;
   exercises: Exercise[];
 }) {
-  const { t } = useI18n();
+  const { t, tExercise } = useI18n();
   const [name, setName] = useState("");
   const [items, setItems] = useState<RoutineExercise[]>([]);
 
@@ -171,7 +171,7 @@ function RoutineModal({
                 }}
               >
                 {exercises.map((ex) => (
-                  <option key={ex.id} value={ex.id}>{ex.name}</option>
+                  <option key={ex.id} value={ex.id}>{tExercise(ex.name)}</option>
                 ))}
               </Select>
               {isCardio ? (
